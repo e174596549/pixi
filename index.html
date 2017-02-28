@@ -16,10 +16,10 @@
 
             /*
             画布填满window
-            renderer.view.style.position = "absolute";
-            renderer.view.style.display = "block";
-            renderer.autoResize = true;
-            renderer.resize(window.innerWidth, window.innerHeight);
+            renderer.view.style.position = "absolute"
+            renderer.view.style.display = "block"
+            renderer.autoResize = true
+            renderer.resize(window.innerWidth, window.innerHeight)
             */
 
             /*
@@ -36,38 +36,70 @@
             background.width = renderer.width
             background.height = renderer.height
             stage.addChild(background)
-            /*
-            //创建一个玩家精灵 直接引入
-              var player = new PIXI.Sprite.fromImage('./assets/img/player.png')
-            */
 
-            //创建一个精灵 通过缓存加载时引入
+            //内置基本图形绘制方法
+            var rectangle = new PIXI.Graphics()
+            rectangle.lineStyle(4, 0xFF3300, 1)
+            rectangle.beginFill(0x66CCFF)
+            rectangle.drawRect(0, 0, 64, 64)
+            rectangle.endFill()
+            rectangle.x = 170
+            rectangle.y = 170
+            //stage.addChild(rectangle)
+            //
+            //文字显示
+            var message = new PIXI.Text("Hello Pixi!", {
+                fontFamily: "Arial",
+                fontSize: 32,
+                fill: "white"
+            })
+            message.position.set(50, 50)
+            stage.addChild(message)
 
-            PIXI.loader.add("./assets/img/player.png").load(setup);
+            //创建一个npc精灵 直接引入
+            var npc = new PIXI.Sprite.fromImage('./assets/img/npc.png')
+            npc.position.set(renderer.width / 2 + 10, renderer.height / 2 + 115)
+            npc.scale.x = 2
+            npc.scale.y = 2
+            stage.addChild(npc)
+            //
+            //创建一个boss精灵 直接引入
+            var boss = new PIXI.Sprite.fromImage('./assets/img/boss.png')
+            boss.position.set(renderer.width - 90, renderer.height / 2 + 25)
+            boss.scale.x = 2
+            boss.scale.y = 2
+            stage.addChild(boss)
+            //
+            // 创建一个精灵 通过缓存加载时引入
+            PIXI.loader.add("./assets/img/player.png").load(setup)
+
             //图片被载入时会运行
             function setup() {
 
                 //Create the `player` sprite from the texture
-                player = new PIXI.Sprite(PIXI.loader.resources["./assets/img/player.png"].texture);
+                player = new PIXI.Sprite(PIXI.loader.resources["./assets/img/player.png"].texture)
                 //将中心点定在角色图片的中心
                 player.anchor.set(0.5)
                 // 放置在画面中间靠下的位置
                 player.position.set(15, renderer.height / 2 + 136)
 
-                //改变大小 player.width = 200;
+                //改变大小 player.width = 200
                 //
-                //player.height = 200;
+                //player.height = 200
                 //
 
                 //设置放大倍数，因为原图很小，只有 24x24，所以需要放大一下
                 player.scale.x = 2
                 player.scale.y = 2
-                //设置速度
-                player.vx = 0;
-                player.vy = 0;
-                // Add the sprite to the stage
-                stage.addChild(player);
 
+                //设置速度
+                player.vx = 0
+                player.vy = 0
+
+                // 将精灵加入画布
+                stage.addChild(player)
+
+                //设置按键监听
                 var left = keyboard(37)
                 var up = keyboard(38)
                 var right = keyboard(39)
@@ -76,68 +108,70 @@
                 left.press = function () {
 
                     //Change the player's velocity when the key is pressed
-                    player.vx = -5;
-                    player.vy = 0;
-                    console.log('player.x = ', player.getGlobalPosition().x);
-                    console.log('player.y = ', player.getGlobalPosition().y);
+                    player.vx = -5
+                    player.vy = 0
+                    console.log('player.x = ', player.getGlobalPosition().x)
+                    console.log('player.y = ', player.getGlobalPosition().y)
                 }
                 left.release = function () {
 
                     //If the left arrow has been released, and the right arrow isn't down, and the player isn't moving vertically: Stop the player
                     if (!right.isDown && player.vy === 0) {
-                        player.vx = 0;
+                        player.vx = 0
                     }
-                    console.log('player.x = ', player.getGlobalPosition().x);
-                    console.log('player.y = ', player.getGlobalPosition().y);
-                };
+                    console.log('player.x = ', player.getGlobalPosition().x)
+                    console.log('player.y = ', player.getGlobalPosition().y)
+                }
 
                 //Right
                 right.press = function () {
-                    player.vx = 5;
-                    player.vy = 0;
-                    console.log('player.x = ', player.getGlobalPosition().x);
-                    console.log('player.y = ', player.getGlobalPosition().y);
-                };
+                    player.vx = 5
+                    player.vy = 0
+                    console.log('player.x = ', player.getGlobalPosition().x)
+                    console.log('player.y = ', player.getGlobalPosition().y)
+                }
                 right.release = function () {
                     if (!left.isDown && player.vy === 0) {
-                        player.vx = 0;
+                        player.vx = 0
                     }
-                    console.log('player.x = ', player.getGlobalPosition().x);
-                    console.log('player.y = ', player.getGlobalPosition().y);
-                };
+                    console.log('player.x = ', player.getGlobalPosition().x)
+                    console.log('player.y = ', player.getGlobalPosition().y)
+                }
 
                 //Up
                 up.press = function () {
-                    player.vy = -5;
-                    player.vx = 0;
-                    console.log('player.x = ', player.getGlobalPosition().x);
-                    console.log('player.y = ', player.getGlobalPosition().y);
-                };
+                    player.vy = -5
+                    player.vx = 0
+                    console.log('player.x = ', player.getGlobalPosition().x)
+                    console.log('player.y = ', player.getGlobalPosition().y)
+                }
                 up.release = function () {
                     if (!down.isDown && player.vx === 0) {
-                        player.vy = 0;
+                        player.vy = 0
                     }
-                    console.log('player.x = ', player.getGlobalPosition().x);
-                    console.log('player.y = ', player.getGlobalPosition().y);
-                };
+                    console.log('player.x = ', player.getGlobalPosition().x)
+                    console.log('player.y = ', player.getGlobalPosition().y)
+                }
 
                 //Down
                 down.press = function () {
-                    player.vy = 5;
-                    player.vx = 0;
-                    console.log('player.x = ', player.getGlobalPosition().x);
-                    console.log('player.y = ', player.getGlobalPosition().y);
-                };
+                    player.vy = 5
+                    player.vx = 0
+                    console.log('player.x = ', player.getGlobalPosition().x)
+                    console.log('player.y = ', player.getGlobalPosition().y)
+                }
                 down.release = function () {
                     if (!up.isDown && player.vx === 0) {
-                        player.vy = 0;
+                        player.vy = 0
                     }
-                    console.log('player.x = ', player.getGlobalPosition().x);
-                    console.log('player.y = ', player.getGlobalPosition().y);
-                };
+                    console.log('player.x = ', player.getGlobalPosition().x)
+                    console.log('player.y = ', player.getGlobalPosition().y)
+                }
 
+                //绑定play状态
                 state = play
-                // 动画
+
+                // 游戏动画循环刷新画布
                 gameLoop()
             }
 
@@ -155,28 +189,28 @@
 
             /*
             //载入一张png图片中的一部分进行使用
-            PIXI.loader.add("./assets/img/characters.png").load(setup2);
+            PIXI.loader.add("./assets/img/characters.png").load(setup2)
 
             function setup2() {
 
                 //Create the `tileset` sprite from the texture
-                var texture = PIXI.utils.TextureCache["./assets/img/characters.png"];
+                var texture = PIXI.utils.TextureCache["./assets/img/characters.png"]
 
                 // 创建一个矩形
-                var rectangle = new PIXI.Rectangle(50, 50, 50, 50);
+                var rectangle = new PIXI.Rectangle(50, 50, 50, 50)
                 //  使用矩形部分
-                texture.frame = rectangle;
+                texture.frame = rectangle
                 // Create the sprite from the texture
-                rocket = new PIXI.Sprite(texture);
+                rocket = new PIXI.Sprite(texture)
 
                 //Position the rocket sprite on the canvas
-                rocket.x = 32;
-                rocket.y = 32;
+                rocket.x = 32
+                rocket.y = 32
 
                 //Add the rocket to the stage
-                stage.addChild(rocket);
+                stage.addChild(rocket)
 
-                //Render the stage renderer.render(stage);
+                //Render the stage renderer.render(stage)
             }
             */
 
@@ -210,8 +244,8 @@
                 }
 
                 //设置速度
-                player.vx = 3;
-                player.vy = 1;
+                player.vx = 3
+                player.vy = 1
 
                 if (positionflag) {
                     player.x -= player.vx //回到起点
@@ -221,52 +255,144 @@
 
             }
 
+            function hitTestRectangle(r1, r2) {
+
+                //Define the variables we'll need to calculate
+                var hit,
+                    combinedHalfWidths,
+                    combinedHalfHeights,
+                    vx,
+                    vy;
+
+                //hit will determine whether there's a collision
+                hit = false;
+
+                //Find the center points of each sprite
+                r1.centerX = r1.x + r1.width / 2;
+                r1.centerY = r1.y + r1.height / 2;
+                r2.centerX = r2.x + r2.width / 2;
+                r2.centerY = r2.y + r2.height / 2;
+
+                //Find the half-widths and half-heights of each sprite
+                r1.halfWidth = r1.width / 2;
+                r1.halfHeight = r1.height / 2;
+                r2.halfWidth = r2.width / 2;
+                r2.halfHeight = r2.height / 2;
+
+                //Calculate the distance vector between the sprites
+                vx = r1.centerX - r2.centerX;
+                vy = r1.centerY - r2.centerY;
+
+                //Figure out the combined half-widths and half-heights
+                combinedHalfWidths = r1.halfWidth + r2.halfWidth;
+                combinedHalfHeights = r1.halfHeight + r2.halfHeight;
+
+                //Check for a collision on the x axis
+                if (Math.abs(vx) < combinedHalfWidths) {
+
+                    //A collision might be occuring. Check for a collision on the y axis
+                    if (Math.abs(vy) < combinedHalfHeights) {
+
+                        //There's definitely a collision happening
+                        hit = true;
+                    } else {
+
+                        //There's no collision on the y axis
+                        hit = false;
+                    }
+                } else {
+
+                    //There's no collision on the x axis
+                    hit = false;
+                }
+
+                //`hit` will be either `true` or `false`
+                return hit;
+            };
+            go = 1
+            //判断player与npc是否相遇
+            var isCollision = function () {
+                if (hitTestRectangle(player, npc)) {
+                    console.log('npc 与 player 相遇了')
+                    rotationAndScale()
+                    setTimeout(() => go = 0, 150)
+
+                    //修改文字
+                    message.text = "Defeated"
+                    message.style = {
+                        fill: "black",
+                        font: "32px PetMe64"
+                    }
+
+                } else if (hitTestRectangle(player, boss)) {
+                    console.log('npc 与 boss 相遇了')
+                    player.scale.x = 10
+                    player.scale.y = 10
+                    setTimeout(() => go = 0, 150)
+                    message.text = "You won!"
+                    message.style = {
+                        fill: "red",
+                        font: "32px PetMe64"
+                    }
+                } else {
+                    //There's no collision
+                    player.scale.x = 2
+                    player.scale.y = 2
+                    player.rotation = 0
+                }
+            }
+
             //键盘配置
             function keyboard(keyCode) {
-                var key = {};
-                key.code = keyCode;
-                key.isDown = false;
-                key.isUp = true;
-                key.press = undefined;
-                key.release = undefined;
+                var key = {}
+                key.code = keyCode
+                key.isDown = false
+                key.isUp = true
+                key.press = undefined
+                key.release = undefined
                 //The `downHandler`
                 key.downHandler = function (event) {
                     if (event.keyCode === key.code) {
                         if (key.isUp && key.press)
-                            key.press();
-                        key.isDown = true;
-                        key.isUp = false;
+                            key.press()
+                        key.isDown = true
+                        key.isUp = false
                     }
-                    event.preventDefault();
-                };
+                    event.preventDefault()
+                }
 
                 //The `upHandler`
                 key.upHandler = function (event) {
                     if (event.keyCode === key.code) {
                         if (key.isDown && key.release)
-                            key.release();
-                        key.isDown = false;
-                        key.isUp = true;
+                            key.release()
+                        key.isDown = false
+                        key.isUp = true
                     }
-                    event.preventDefault();
-                };
+                    event.preventDefault()
+                }
 
                 //Attach event listeners
-                window.addEventListener("keydown", key.downHandler.bind(key), false);
-                window.addEventListener("keyup", key.upHandler.bind(key), false);
-                return key;
+                window.addEventListener("keydown", key.downHandler.bind(key), false)
+                window.addEventListener("keyup", key.upHandler.bind(key), false)
+                return key
             }
 
+            //游戏动作执行函数
             function play() {
-                rotationAndScale()
+                isCollision()
                 //moveBackAndForth() Use the player's velocity to make it move
-                player.x += player.vx
-                player.y += player.vy
+                if (go) {
+                    player.x += player.vx
+                    player.y += player.vy
+                }
             }
 
+            //游戏循环刷新画布函数
             function gameLoop() {
                 requestAnimationFrame(gameLoop)
 
+                //刷新状态
                 state()
 
                 //渲染 Container
