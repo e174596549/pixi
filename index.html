@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>pixi</title>
+        <!-- <link rel="stylesheet" href="./assets/css/style.css"> -->
+        <script src="assets/js/pixi.min.js"></script>
+    </head>
+    <body>
+        <script>
+            // 将默认的缩放模式定义为 Nearest
+            PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST
+
+            var renderer = PIXI.autoDetectRenderer(800, 450, {backgroundColor: 0x000000})
+            document.body.appendChild(renderer.view)
+
+            /*
+            画布填满window
+            renderer.view.style.position = "absolute";
+            renderer.view.style.display = "block";
+            renderer.autoResize = true;
+            renderer.resize(window.innerWidth, window.innerHeight);
+            */
+
+            /*
+            自适应画布大小
+            renderer.autoResize = true
+            renderer.resize(512, 512)
+            */
+
+            //创建舞台 Container
+            var stage = new PIXI.Container()
+
+            // 创建背景精灵
+            var background = new PIXI.Sprite.fromImage('./assets/img/BackDrop_01.png')
+            background.width = renderer.width
+            background.height = renderer.height
+            stage.addChild(background)
+            /*
+            //创建一个玩家精灵 直接引入
+              var player = new PIXI.Sprite.fromImage('./assets/img/player.png')
+            */
+
+            //创建一个精灵 通过缓存加载时引入
+
+            PIXI.loader.add("./assets/img/player.png").load(setup);
+            //图片被载入时会运行
+            function setup() {
+
+                //Create the `player` sprite from the texture
+                player = new PIXI.Sprite(PIXI.loader.resources["./assets/img/player.png"].texture);
+                //将中心点定在角色图片的中心
+                player.anchor.set(0.5)
+                // 放置在画面中间靠下的位置
+                player.position.set(15, renderer.height / 2 + 136)
+
+                //改变大小 player.width = 200;
+                //
+                //player.height = 200;
+                //
+
+                //设置放大倍数，因为原图很小，只有 24x24，所以需要放大一下
+                player.scale.x = 2
+                player.scale.y = 2
+                //设置速度
+                player.vx = 0;
+                player.vy = 0;
+                // Add the sprite to the stage
+                stage.addChild(player);
+
+                var left = keyboard(37)
+                var up = keyboard(38)
+                var right = keyboard(39)
+                var down = keyboard(40)
+
+                left.press = function () {
+
+                    //Change the player's velocity when the key is pressed
+                    player.vx = -5;
+                    player.vy = 0;
+                    console.log('player.x = ', player.getGlobalPosition().x);
+                    console.log('player.y = ', player.getGlobalPosition().y);
+                }
+                left.release = function () {
+
+                    //If the left arrow has been released, and the right arrow isn't down, and the player isn't moving vertically: Stop the player
+                    if (!right.isDown && player.vy === 0) {
+                        player.vx = 0;
+                    }
+                    console.log('player.x = ', player.getGlobalPosition().x);
+                    console.log('player.y = ', player.getGlobalPosition().y);
+                };
+
+                //Right
+                right.press = function () {
+                    player.vx = 5;
+                    player.vy = 0;
+                    console.log('player.x = ', player.getGlobalPosition().x);
+                    console.log('player.y = ', player.getGlobalPosition().y);
+                };
+                right.release = function () {
+                    if (!left.isDown && player.vy === 0) {
+                        player.vx = 0;
+                    }
+                    console.log('player.x = ', player.getGlobalPosition().x);
+                    console.log('player.y = ', player.getGlobalPosition().y);
+                };
+
+                //Up
+                up.press = function () {
+                    player.vy = -5;
+                    player.vx = 0;
+                    console.log('player.x = ', player.getGlobalPosition().x);
+                    console.log('player.y = ', player.getGlobalPosition().y);
+                };
+                up.release = function () {
+                    if (!down.isDown && player.vx === 0) {
+                        player.vy = 0;
+                    }
+                    console.log('player.x = ', player.getGlobalPosition().x);
+                    console.log('player.y = ', player.getGlobalPosition().y);
+                };
+
+                //Down
+                down.press = function () {
+                    player.vy = 5;
+                    player.vx = 0;
+                    console.log('player.x = ', player.getGlobalPosition().x);
+                    console.log('player.y = ', player.getGlobalPosition().y);
+                };
+                down.release = function () {
+                    if (!up.isDown && player.vx === 0) {
+                        player.vy = 0;
+                    }
+                    console.log('player.x = ', player.getGlobalPosition().x);
+                    console.log('player.y = ', player.getGlobalPosition().y);
+                };
+
+                state = play
+                // 动画
+                gameLoop()
+            }
+
+            //移除精灵
+            //
+            //stage.removeChild(anySprite)
+            //
+            //隐藏精灵
+            //
+            //anySprite.visible = false
+            //
+
+            //使用别名
+            var TextureCache = PIXI.utils.TextureCache
+
+            /*
+            //载入一张png图片中的一部分进行使用
+            PIXI.loader.add("./assets/img/characters.png").load(setup2);
+
+            function setup2() {
+
+                //Create the `tileset` sprite from the texture
+                var texture = PIXI.utils.TextureCache["./assets/img/characters.png"];
+
+                // 创建一个矩形
+                var rectangle = new PIXI.Rectangle(50, 50, 50, 50);
+                //  使用矩形部分
+                texture.frame = rectangle;
+                // Create the sprite from the texture
+                rocket = new PIXI.Sprite(texture);
+
+                //Position the rocket sprite on the canvas
+                rocket.x = 32;
+                rocket.y = 32;
+
+                //Add the rocket to the stage
+                stage.addChild(rocket);
+
+                //Render the stage renderer.render(stage);
+            }
+            */
+
+            //缩放旋转效果
+            var rotationAndScale = function () {
+                //添加旋转效果
+                player.rotation += 0.1
+
+                //添加缩放效果
+                if (player.scale.x >= 2) {
+                    scaleflag = 1
+                } else if (player.scale.x <= 0.5) {
+                    scaleflag = 0
+                }
+
+                scaleflag
+                    ? player.scale.x -= 0.05
+                    : player.scale.x += 0.05
+
+                scaleflag
+                    ? player.scale.y -= 0.05
+                    : player.scale.y += 0.05
+            }
+
+            //往复移动
+            var moveBackAndForth = function () {
+                if (player.x >= 785) {
+                    positionflag = 1
+                } else if (player.x <= 15) {
+                    positionflag = 0
+                }
+
+                //设置速度
+                player.vx = 3;
+                player.vy = 1;
+
+                if (positionflag) {
+                    player.x -= player.vx //回到起点
+                } else {
+                    player.x += player.vx //到达终点
+                }
+
+            }
+
+            //键盘配置
+            function keyboard(keyCode) {
+                var key = {};
+                key.code = keyCode;
+                key.isDown = false;
+                key.isUp = true;
+                key.press = undefined;
+                key.release = undefined;
+                //The `downHandler`
+                key.downHandler = function (event) {
+                    if (event.keyCode === key.code) {
+                        if (key.isUp && key.press)
+                            key.press();
+                        key.isDown = true;
+                        key.isUp = false;
+                    }
+                    event.preventDefault();
+                };
+
+                //The `upHandler`
+                key.upHandler = function (event) {
+                    if (event.keyCode === key.code) {
+                        if (key.isDown && key.release)
+                            key.release();
+                        key.isDown = false;
+                        key.isUp = true;
+                    }
+                    event.preventDefault();
+                };
+
+                //Attach event listeners
+                window.addEventListener("keydown", key.downHandler.bind(key), false);
+                window.addEventListener("keyup", key.upHandler.bind(key), false);
+                return key;
+            }
+
+            function play() {
+                rotationAndScale()
+                //moveBackAndForth() Use the player's velocity to make it move
+                player.x += player.vx
+                player.y += player.vy
+            }
+
+            function gameLoop() {
+                requestAnimationFrame(gameLoop)
+
+                state()
+
+                //渲染 Container
+                renderer.render(stage)
+            }
+        </script>
+    </body>
+</html>
